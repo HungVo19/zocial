@@ -1,0 +1,159 @@
+version: '3.8'
+
+services:
+  # Infrastructure Services
+  postgres:
+    image: postgres:15-alpine
+    container_name: zocial-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_MULTIPLE_DATABASES: zocial_authentication,zocial_user,zocial_post,zocial_feed,zocial_comment,zocial_like,zocial_notification,zocial_chat,zocial_search,zocial_analytic,zocial_media
+    volumes:
+      - zocial_postgres_data:/var/lib/postgresql/data
+      - ./init-multiple-postgres-databases.sh:/docker-entrypoint-initdb.d/init-multiple-postgres-databases.sh
+    ports:
+      - "5433:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - zocial-network
+
+  redis:
+    image: redis:7-alpine
+    container_name: zocial-redis
+    ports:
+      - "6380:6379"
+    volumes:
+      - zocial_redis_data:/data
+    command: redis-server --appendonly yes
+    networks:
+      - zocial-network
+
+  zookeeper:
+    image: confluentinc/cp-zookeeper:7.4.0
+    container_name: zocial-zookeeper
+    environment:
+      ZOOKEEPER_CLIENT_PORT: 2181
+      ZOOKEEPER_TICK_TIME: 2000
+    ports:
+      - "2182:2181"
+    networks:
+      - zocial-network
+
+  kafka:
+    image: confluentinc/cp-kafka:7.4.0
+    container_name: zocial-kafka
+    depends_on:
+      - zookeeper
+    ports:
+      - "9093:9092"
+    environment:
+      KAFKA_BROKER_ID: 1
+      KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:29092,PLAINTEXT_HOST://localhost:9092
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT
+      KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+    networks:
+      - zocial-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:22.0
+    container_name: zocial-keycloak
+    environment:
+      KEYCLOAK_ADMIN: admin
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KC_DB: postgres
+      KC_DB_URL: jdbc:postgresql://postgres:5432/zocial_authentication
+      KC_DB_USERNAME: postgres
+      KC_DB_PASSWORD: postgres
+    command:
+      - start-dev
+      - --import-realm
+    volumes:
+      - ./keycloak/realm-export.json:/opt/keycloak/data/import/realm-export.json
+    ports:
+      - "8181:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+    networks:
+      - zocial-network
+
+  # Core Services
+#  api-gateway:
+#    build:
+#      context: ./api-gateway
+#      dockerfile: Dockerfile
+#    container_name: zocial-api-gateway
+#    ports:
+#      - "8181:8080"
+#    environment:
+#      SPRING_PROFILES_ACTIVE: prod
+#      SPRING_CLOUD_GATEWAY_ROUTES_URI: http://localhost:8080
+#      KEYCLOAK_AUTH_SERVER_URL: http://keycloak:8080
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#    depends_on:
+#      - keycloak
+#      - eureka-server
+#    networks:
+#      - zocial-network
+
+  eureka-server:
+    build:
+      context: ./eureka-server
+      dockerfile: Dockerfile
+    container_name: zocial-eureka
+    ports:
+      - "8761:8761"
+    networks:
+      - zocial-network
+
+#  user-service:
+#    build:
+#      context: ./user-service
+#      dockerfile: Dockerfile
+#    container_name: zocial-user-service
+#    environment:
+#      SPRING_PROFILES_ACTIVE: prod
+#      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/zocial_user
+#      SPRING_DATASOURCE_USERNAME: postgres
+#      SPRING_DATASOURCE_PASSWORD: postgres
+#      EUREKA_CLIENT_SERVICEURL_DEFAULTZONE: http://eureka-server:8761/eureka/
+#    depends_on:
+#      - postgres
+#      - kafka
+#      - redis
+#      - eureka-server
+#    networks:
+#      - zocial-network
+
+  #Frontend
+  
+#  frontend:
+#    build:
+#      context: ./zocial-frontend
+#      dockerfile: Dockerfile
+#    container_name: zocial-frontend
+#    ports:
+#      - "3000:80"
+#    environment:
+#      VITE_API_URL: http://localhost:8080
+#      VITE_KEYCLOAK_URL: http://localhost:8180
+#    depends_on:
+#      - api-gateway
+#    networks:
+#      - zocial-network
+
+networks:
+  zocial-network:
+    driver: bridge
+
+volumes:
+  zocial_postgres_data:
+  zocial_redis_data:
+
