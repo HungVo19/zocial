@@ -1,8 +1,8 @@
-FROM amazoncorretto:17-alpine
+FROM amazoncorretto:23-alpine
 
 LABEL maintainer="Hung Vo <votranhung.dev@gmail.com>" \
       version="1.0" \
-      description="Zocial Eureka Server" \
+      description="Zocial Eureka Service" \
       author="Hung Vo" \
       email="votranhung.dev@gmail.com"
 
