@@ -109,7 +109,7 @@ services:
       dockerfile: Dockerfile
     container_name: zocial-eureka
     ports:
-      - "8761:8761"
+      - "8762:8762"
     networks:
       - zocial-network
 
