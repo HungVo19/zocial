@@ -10,6 +10,8 @@ import org.springframework.web.cors.reactive.UrlBasedCorsConfigurationSource;
 @Configuration
 public class CorsConfig {
 
+    // CorsWebFiler for SpringWebFlux
+    // CorsFilter for normal SpringWeb
     @Bean
     public CorsWebFilter corsWebFilter() {
 
