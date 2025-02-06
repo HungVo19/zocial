@@ -1,4 +1,4 @@
-package config;
+package com.zocial.gateway.config;
 
 
 import org.springframework.context.annotation.Bean;
@@ -14,9 +14,7 @@ public class CorsConfig {
     // CorsFilter for normal SpringWeb
     @Bean
     public CorsWebFilter corsWebFilter() {
-
         CorsConfiguration corsConfiguration = new CorsConfiguration();
-
         corsConfiguration.addAllowedHeader("*");
         corsConfiguration.addAllowedMethod("*");
         corsConfiguration.addAllowedOrigin("*");

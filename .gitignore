@@ -4,3 +4,4 @@
 *.iml
 *.ipr
 keycloak/*
+*/node_modules

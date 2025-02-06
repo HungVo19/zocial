@@ -156,4 +156,3 @@ networks:
 volumes:
   zocial_postgres_data:
   zocial_redis_data:
-
