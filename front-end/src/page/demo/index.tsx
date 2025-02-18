@@ -1,8 +1,8 @@
 import {Box, Button, Input, Select, Typography} from "@mui/joy";
-import React, {useEffect, useState} from "react";
+import {useEffect, useState} from "react";
 import Option from '@mui/joy/Option';
 import {AsYouType, CountryCode, getCountryCallingCode, parsePhoneNumberFromString} from 'libphonenumber-js';
-import { FlagImage } from 'react-international-phone';
+import {FlagImage} from 'react-international-phone';
 
 const countries = [
     {iso2: 'VN', name: 'Vietnam'},
@@ -116,7 +116,7 @@ const Demo = () => {
                             <Option value=''>Chọn mã quốc gia</Option>
                             {countries.map((data) => (
                                 <Option key={data.iso2} value={data.iso2}>
-                                    <FlagImage iso2={data.iso2.toLowerCase()} size="30px" />
+                                    <FlagImage iso2={data.iso2.toLowerCase()} size="30px"/>
                                     {`${data.name} (+${getCountryCallingCode(data.iso2.toUpperCase() as CountryCode)})`}
                                 </Option>
                             ))}
@@ -138,14 +138,14 @@ const Demo = () => {
                         <Option value=''>Chọn mã quốc gia</Option>
                         {countries.map((data) => (
                             <Option key={data.iso2} value={data.iso2}>
-                                <FlagImage iso2={data.iso2.toLowerCase()} size="30px" />{data.name}
+                                <FlagImage iso2={data.iso2.toLowerCase()} size="30px"/>{data.name}
                             </Option>
                         ))}
                     </Select>
-                    <Box sx={{ marginTop:5, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{marginTop: 5, display: 'flex', gap: 2, flexWrap: 'wrap'}}>
                         <Button onClick={getInternationalPhoneFormat}>Lấy số điện thoại</Button>
                     </Box>
-                    <Box sx={{ marginTop:5, display: 'flex', gap: 2, flexWrap: 'wrap' }}>
+                    <Box sx={{marginTop: 5, display: 'flex', gap: 2, flexWrap: 'wrap'}}>
                         <Typography component="div">Số điện thoại gửi về backend là: {tel}</Typography>
                     </Box>
                 </Box>
