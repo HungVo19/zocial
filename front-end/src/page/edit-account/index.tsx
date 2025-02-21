@@ -316,7 +316,7 @@ const UpdateAccount = () => {
                     handleCloseConfirm={() => setOpenConfirm(false)}
                     buttonCancel='Hủy bỏ'
                     buttonSubmit='Xác nhận'
-                    title='Bạn có chắc chắn muốn cập nhật trạng thái tài khoản này không?'
+                    title='Bạn có chắc chắn hủy bỏ thay đổi không?'
                 />
                 <Typography
                     variant='h5'
